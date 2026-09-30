@@ -1,0 +1,14 @@
+# Serves the site at http://localhost/<folder>/ and the admin at http://localhost/<folder>/admin
+# without typing /public
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Strip trailing slash (e.g. /ecommerce/admin/ -> /ecommerce/admin) before rewriting into public/
+  RewriteCond %{REQUEST_URI} ^(.+)/$
+  RewriteRule ^(.+)/$ %1 [R=301,L]
+
+  RewriteRule ^$ public/ [L]
+  RewriteRule (.*) public/$1 [L]
+</IfModule>
