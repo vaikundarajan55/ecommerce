@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 
 use App\Models\CategoryModel;
 use App\Models\EnquiryModel;
+use App\Models\ProductImageModel;
 use App\Models\ProductModel;
 use App\Models\SubcategoryModel;
 
@@ -67,7 +68,13 @@ class Shop extends BaseController
         $related = (new ProductModel())->where('status', 1)
             ->where('category_id', $product['category_id'])->where('id !=', $product['id'])->findAll(4);
 
-        return view('website/shop/view', ['title' => $product['name'], 'p' => $product, 'related' => $related]);
+        // Main image first, then the extra gallery images
+        $images = array_merge(
+            $product['image'] ? [$product['image']] : [],
+            array_column((new ProductImageModel())->forProduct((int) $product['id']), 'image')
+        );
+
+        return view('website/shop/view', ['title' => $product['name'], 'p' => $product, 'images' => $images, 'related' => $related]);
     }
 
     public function enquiry(int $id)

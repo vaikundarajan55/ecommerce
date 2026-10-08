@@ -50,4 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const num = document.getElementById('cardNumber');
     if (num) num.addEventListener('input', () => { num.value = num.value.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim(); });
   }
+
+  // Product page gallery: click a thumbnail to show it as the main image
+  const galleryMain = document.getElementById('galleryMain');
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.gallery-thumb.active').forEach(a => a.classList.remove('active'));
+    t.classList.add('active');
+    galleryMain.style.opacity = 0;
+    setTimeout(() => { galleryMain.src = t.dataset.src; galleryMain.style.opacity = 1; }, 150);
+  }));
 });

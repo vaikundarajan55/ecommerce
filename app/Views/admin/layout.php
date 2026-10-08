@@ -12,51 +12,105 @@
 <?php
   $unreadEnq = (new \App\Models\EnquiryModel())->where('is_read', 0)->countAllResults();
   $unreadCon = (new \App\Models\ContactModel())->where('is_read', 0)->countAllResults();
+  $uri       = uri_string();
+
+  // Sidebar menu: [path, icon, label, badge] or [group label, icon, children]
   $nav = [
     ['admin/dashboard', 'bi-speedometer2', 'Dashboard', 0],
-    ['GROUP', 'Catalog'],
-    ['admin/banners', 'bi-images', 'Banners', 0],
-    ['admin/categories', 'bi-grid', 'Categories', 0],
-    ['admin/subcategories', 'bi-diagram-3', 'Subcategories', 0],
-    ['admin/products', 'bi-box-seam', 'Products', 0],
-    ['GROUP', 'Sales'],
-    ['admin/orders', 'bi-receipt', 'Orders', 0],
-    ['admin/users', 'bi-people', 'Users', 0],
-    ['GROUP', 'Messages'],
-    ['admin/enquiries', 'bi-question-circle', 'Enquiries', $unreadEnq],
-    ['admin/contacts', 'bi-envelope', 'Contact us', $unreadCon],
-    ['GROUP', 'Account'],
-    ['admin/change-password', 'bi-key', 'Change password', 0],
-    ['admin/logout', 'bi-box-arrow-right', 'Logout', 0],
+    ['Catalog', 'bi-grid', [
+      ['admin/banners', 'bi-images', 'Banners', 0],
+      ['admin/categories', 'bi-grid', 'Categories', 0],
+      ['admin/subcategories', 'bi-diagram-3', 'Subcategories', 0],
+      ['admin/products', 'bi-box-seam', 'Products', 0],
+    ]],
+    ['Sales', 'bi-receipt', [
+      ['admin/orders', 'bi-receipt', 'Orders', 0],
+      ['admin/users', 'bi-people', 'Users', 0],
+      ['admin/reports', 'bi-bar-chart-line', 'Reports', 0],
+    ]],
+    ['Messages', 'bi-chat-dots', [
+      ['admin/enquiries', 'bi-question-circle', 'Enquiries', $unreadEnq],
+      ['admin/contacts', 'bi-envelope', 'Contact us', $unreadCon],
+    ]],
   ];
+
+  // Page header: icon + subtitle per section; sub-pages (create / edit / view) get a Back button
+  $pages = [
+    'admin/dashboard'       => ['bi-speedometer2', 'Overview of sales, orders and store activity'],
+    'admin/banners'         => ['bi-images', 'Manage home page slider banners'],
+    'admin/categories'      => ['bi-grid', 'Organise the catalog into categories'],
+    'admin/subcategories'   => ['bi-diagram-3', 'Group products inside each category'],
+    'admin/products'        => ['bi-box-seam', 'Add, edit and track your products'],
+    'admin/orders'          => ['bi-receipt', 'Review and manage customer orders'],
+    'admin/users'           => ['bi-people', 'Registered customers and their accounts'],
+    'admin/reports'         => ['bi-bar-chart-line', 'Sales reports by year and month'],
+    'admin/enquiries'       => ['bi-question-circle', 'Questions customers asked about products'],
+    'admin/contacts'        => ['bi-envelope', 'Messages from the contact us form'],
+    'admin/change-password' => ['bi-key', 'Keep your admin account secure'],
+  ];
+  $section = implode('/', array_slice(explode('/', $uri), 0, 2));
+  [$pageIcon, $pageSub] = $pages[$section] ?? ['bi-app', ''];
+  $backUrl = substr_count($uri, '/') >= 2 && isset($pages[$section]) ? base_url($section) : null;
+
+  $adminName = (string) session('admin_name');
+  $initials  = strtoupper(implode('', array_map(static fn ($w) => $w[0] ?? '', array_slice(preg_split('/\s+/', trim($adminName) ?: 'A'), 0, 2))));
+  $isActive  = static fn (string $p) => str_starts_with($uri, $p);
 ?>
+<script>try { if (localStorage.getItem('adminSidebar') === 'mini') document.body.classList.add('sb-mini'); } catch (e) {}</script>
 <div class="scrim" id="scrim"></div>
 <aside class="sidebar" id="sidebar">
-  <a href="<?= base_url('admin/dashboard') ?>" class="logo"><i class="bi bi-bag-heart-fill"></i><?= site_name() ?></a>
-  <nav class="nav flex-column">
-    <?php foreach ($nav as $n): if ($n[0] === 'GROUP'): ?>
-      <div class="group"><?= $n[1] ?></div>
+  <a href="<?= base_url('admin/dashboard') ?>" class="brand" title="<?= esc(site_name()) ?>">
+    <span class="brand-logo"><i class="bi bi-bag-heart-fill"></i></span>
+    <span class="sb-label"><span class="brand-name"><?= site_name() ?></span><span class="brand-sub">Admin panel</span></span>
+  </a>
+  <nav class="sb-nav">
+    <?php foreach ($nav as $n): if (is_array($n[2])): ?>
+      <div class="sb-group"><span class="sb-label"><?= $n[0] ?></span></div>
+      <?php foreach ($n[2] as $c): ?>
+        <a class="sb-link <?= $isActive($c[0]) ? 'active' : '' ?>" href="<?= base_url($c[0]) ?>" title="<?= $c[2] ?>"><i class="bi <?= $c[1] ?>"></i><span class="sb-label"><?= $c[2] ?></span><?php if ($c[3]): ?><span class="nav-badge"><?= $c[3] ?></span><?php endif; ?></a>
+      <?php endforeach; ?>
     <?php else: ?>
-      <a class="nav-link <?= str_starts_with(uri_string(), $n[0]) ? 'active' : '' ?>" href="<?= base_url($n[0]) ?>"><i class="bi <?= $n[1] ?>"></i><?= $n[2] ?><?php if ($n[3]): ?><span class="badge text-bg-warning"><?= $n[3] ?></span><?php endif; ?></a>
+      <a class="sb-link <?= $isActive($n[0]) ? 'active' : '' ?>" href="<?= base_url($n[0]) ?>" title="<?= $n[2] ?>"><i class="bi <?= $n[1] ?>"></i><span class="sb-label"><?= $n[2] ?></span></a>
     <?php endif; endforeach; ?>
+    <div class="sb-group"><span class="sb-label">Account</span></div>
+    <a class="sb-link <?= $isActive('admin/change-password') ? 'active' : '' ?>" href="<?= base_url('admin/change-password') ?>" title="Change password"><i class="bi bi-key"></i><span class="sb-label">Change password</span></a>
+    <a class="sb-link" href="<?= base_url('admin/logout') ?>" title="Logout"><i class="bi bi-box-arrow-right"></i><span class="sb-label">Logout</span></a>
   </nav>
 </aside>
 
 <div class="main">
-  <header class="topbar d-flex justify-content-between align-items-center">
-    <div class="d-flex align-items-center gap-3">
-      <button class="btn btn-light d-lg-none" id="menuBtn" aria-label="Menu"><i class="bi bi-list fs-5"></i></button>
-      <h1 class="h5 mb-0"><?= esc($title ?? '') ?></h1>
+<header class="topbar">
+  <button class="menu-toggle" id="menuBtn" aria-label="Toggle menu" title="Toggle menu"><i class="bi bi-list"></i></button>
+  <div class="top-right">
+    <a href="<?= base_url() ?>" target="_blank" class="icon-tile" title="View site"><i class="bi bi-shop"></i></a>
+    <div class="dropdown">
+      <button class="profile-pill" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="d-none d-sm-inline"><?= esc($adminName ?: 'Admin') ?></span><span class="avatar"><?= esc($initials) ?></span><i class="bi bi-chevron-down small"></i></button>
+      <ul class="dropdown-menu dropdown-menu-end nav-drop">
+        <li><a class="dropdown-item" href="<?= base_url() ?>" target="_blank"><i class="bi bi-box-arrow-up-right"></i>View site</a></li>
+        <li><a class="dropdown-item <?= $isActive('admin/change-password') ? 'active' : '' ?>" href="<?= base_url('admin/change-password') ?>"><i class="bi bi-key"></i>Change password</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="<?= base_url('admin/logout') ?>"><i class="bi bi-box-arrow-right"></i>Logout</a></li>
+      </ul>
     </div>
-    <div class="d-flex align-items-center gap-3">
-      <a href="<?= base_url() ?>" target="_blank" class="btn btn-sm btn-outline-brand"><i class="bi bi-box-arrow-up-right me-1"></i>View site</a>
-      <span class="fw-bold d-none d-sm-inline"><i class="bi bi-person-circle me-1"></i><?= esc(session('admin_name')) ?></span>
-    </div>
-  </header>
-  <div class="content">
-    <?= flash_alerts() ?>
-    <?= $this->renderSection('content') ?>
   </div>
+</header>
+
+<main class="content">
+  <section class="page-hero">
+    <div class="d-flex align-items-center gap-3">
+      <span class="hero-icon"><i class="bi <?= $pageIcon ?>"></i></span>
+      <div><h1 class="hero-title"><?= esc($title ?? '') ?></h1><?php if ($pageSub): ?><p class="hero-sub"><?= esc($pageSub) ?></p><?php endif; ?></div>
+    </div>
+    <div class="hero-actions">
+      <?= $this->renderSection('hero_actions') ?>
+      <?php if ($backUrl): ?><a href="<?= $backUrl ?>" class="btn-back"><i class="bi bi-arrow-left"></i>Back</a><?php endif; ?>
+    </div>
+    <span class="hero-line"></span>
+  </section>
+  <?= flash_alerts() ?>
+  <?= $this->renderSection('content') ?>
+</main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?= base_url('assets/admin/js/admin.js') ?>"></script>

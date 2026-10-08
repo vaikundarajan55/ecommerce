@@ -1,4 +1,21 @@
-.env
-writable/cache/*
-writable/logs/*
-writable/session/*
+# Dependencies
+/vendor/
+/node_modules/
+
+
+# CodeIgniter writable files
+/writable/cache/*
+/writable/debugbar/*
+/writable/logs/*
+/writable/session/*
+/writable/uploads/*
+/writable/  
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+/system/Debug/

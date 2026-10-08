@@ -8,8 +8,8 @@ class Contacts extends AdminBase
 {
     public function index()
     {
-        $model = new ContactModel();
-        return $this->render('contacts/index', ['title' => 'Contact messages', 'rows' => $model->orderBy('id', 'DESC')->paginate(10), 'pager' => $model->pager]);
+        $data = $this->listing(new ContactModel(), ['name', 'email', 'subject', 'message'], 'id');
+        return $this->render('contacts/index', ['title' => 'Contact messages'] + $data);
     }
 
     public function view(int $id)

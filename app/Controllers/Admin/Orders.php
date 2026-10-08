@@ -10,21 +10,12 @@ class Orders extends AdminBase
     public function index()
     {
         $model  = new OrderModel();
-        $status = $this->request->getGet('status');
-        $q      = trim((string) $this->request->getGet('q'));
-        if ($status) {
+        $status = (string) $this->request->getGet('status');
+        if ($status !== '') {
             $model->where('status', $status);
         }
-        if ($q !== '') {
-            $model->groupStart()->like('order_no', $q)->orLike('name', $q)->orLike('email', $q)->groupEnd();
-        }
-        return $this->render('orders/index', [
-            'title'  => 'Orders',
-            'rows'   => $model->orderBy('id', 'DESC')->paginate(10),
-            'pager'  => $model->pager,
-            'status' => $status,
-            'q'      => $q,
-        ]);
+        $data = $this->listing($model, ['order_no', 'name', 'email', 'phone'], 'id');
+        return $this->render('orders/index', ['title' => 'Orders', 'status' => $status] + $data);
     }
 
     public function view(int $id)

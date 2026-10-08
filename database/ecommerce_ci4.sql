@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS ecommerce_ci4 CHARACTER SET utf8mb4 COLLATE utf8mb
 USE ecommerce_ci4;
 
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS order_items, orders, enquiries, contacts, products, subcategories, categories, banners, users, admins;
+DROP TABLE IF EXISTS product_images, order_items, orders, enquiries, contacts, products, subcategories, categories, banners, users, admins;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE admins (
@@ -83,6 +83,15 @@ CREATE TABLE products (
   updated_at DATETIME NULL,
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
   FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE product_images (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  product_id INT UNSIGNED NOT NULL,
+  image VARCHAR(255) NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at DATETIME NULL,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE orders (

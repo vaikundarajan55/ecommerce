@@ -9,12 +9,13 @@ class Categories extends AdminBase
 {
     public function index()
     {
-        $rows = db_connect()->query(
-            'SELECT c.*, (SELECT COUNT(*) FROM subcategories s WHERE s.category_id = c.id) subs,
-                    (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id) prods
-             FROM categories c ORDER BY c.id DESC'
-        )->getResultArray();
-        return $this->render('categories/index', ['title' => 'Categories', 'rows' => $rows]);
+        $model = (new CategoryModel())->select(
+            'categories.*, (SELECT COUNT(*) FROM subcategories s WHERE s.category_id = categories.id) subs,
+             (SELECT COUNT(*) FROM products p WHERE p.category_id = categories.id) prods',
+            false
+        );
+        $data = $this->listing($model, ['categories.name', 'categories.slug'], 'categories.id');
+        return $this->render('categories/index', ['title' => 'Categories'] + $data);
     }
 
     public function create()

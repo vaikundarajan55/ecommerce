@@ -17,7 +17,8 @@ class Banners extends AdminBase
 
     public function index()
     {
-        return $this->render('banners/index', ['title' => 'Banners', 'rows' => (new BannerModel())->orderBy('sort_order')->findAll()]);
+        $data = $this->listing(new BannerModel(), ['title', 'subtitle', 'link'], 'sort_order', 'ASC');
+        return $this->render('banners/index', ['title' => 'Banners'] + $data);
     }
 
     public function create()

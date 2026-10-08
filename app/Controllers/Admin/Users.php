@@ -8,13 +8,9 @@ class Users extends AdminBase
 {
     public function index()
     {
-        $model = new UserModel();
-        $q     = trim((string) $this->request->getGet('q'));
-        $model->select('users.*, (SELECT COUNT(*) FROM orders o WHERE o.user_id = users.id) AS order_count');
-        if ($q !== '') {
-            $model->groupStart()->like('name', $q)->orLike('email', $q)->orLike('phone', $q)->groupEnd();
-        }
-        return $this->render('users/index', ['title' => 'Users', 'rows' => $model->orderBy('id', 'DESC')->paginate(10), 'pager' => $model->pager, 'q' => $q]);
+        $model = (new UserModel())->select('users.*, (SELECT COUNT(*) FROM orders o WHERE o.user_id = users.id) AS order_count');
+        $data  = $this->listing($model, ['name', 'email', 'phone', 'city'], 'id');
+        return $this->render('users/index', ['title' => 'Users'] + $data);
     }
 
     public function toggle(int $id)

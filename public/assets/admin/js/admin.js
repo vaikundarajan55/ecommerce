@@ -1,8 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Mobile sidebar
+  // Sidebar toggle: full <-> icons only on desktop (remembered), slide in/out on mobile
   const side = document.getElementById('sidebar'), scrim = document.getElementById('scrim');
-  document.getElementById('menuBtn')?.addEventListener('click', () => { side.classList.toggle('show'); scrim.classList.toggle('show'); });
-  scrim?.addEventListener('click', () => { side.classList.remove('show'); scrim.classList.remove('show'); });
+  const closeMobile = () => { side.classList.remove('show'); scrim.classList.remove('show'); };
+  document.getElementById('menuBtn')?.addEventListener('click', () => {
+    if (window.matchMedia('(max-width: 991.98px)').matches) {
+      side.classList.toggle('show'); scrim.classList.toggle('show');
+    } else {
+      const mini = document.body.classList.toggle('sb-mini');
+      try { localStorage.setItem('adminSidebar', mini ? 'mini' : 'full'); } catch (e) {}
+    }
+  });
+  scrim?.addEventListener('click', closeMobile);
 
   // Confirm on delete forms
   document.querySelectorAll('form[data-confirm]').forEach(f => f.addEventListener('submit', e => {
@@ -29,6 +37,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const img = document.getElementById(inp.dataset.preview); if (!img || !inp.files[0]) return;
     img.src = URL.createObjectURL(inp.files[0]); img.classList.remove('d-none');
   }));
+
+  // Product gallery: mark existing images for removal, preview new picks (picking again adds to the list)
+  const gGrid = document.getElementById('galleryGrid'), gInput = document.getElementById('galleryInput');
+  if (gGrid && gInput) {
+    const max = parseInt(gGrid.dataset.max, 10), addTile = document.getElementById('galleryAdd'), counter = document.getElementById('galleryCount');
+    let picked = [];
+    const kept = () => gGrid.querySelectorAll('.gallery-item input[type=checkbox]:not(:checked)').length;
+    const sync = () => {
+      const dt = new DataTransfer(); picked.forEach(f => dt.items.add(f)); gInput.files = dt.files;
+      gGrid.querySelectorAll('.gallery-item.is-new').forEach(el => el.remove());
+      picked.forEach((f, i) => {
+        const tile = document.createElement('div'); tile.className = 'gallery-item is-new';
+        tile.innerHTML = '<img alt=""><span class="gallery-new">New</span><button type="button" class="gallery-drop" aria-label="Remove"><i class="bi bi-x-lg"></i></button>';
+        tile.querySelector('img').src = URL.createObjectURL(f);
+        tile.querySelector('button').addEventListener('click', () => { picked.splice(i, 1); sync(); });
+        gGrid.insertBefore(tile, addTile);
+      });
+      const total = kept() + picked.length;
+      counter.textContent = total; addTile.classList.toggle('d-none', total >= max);
+    };
+    gInput.addEventListener('change', () => {
+      const room = max - kept() - picked.length, files = [...gInput.files].filter(f => f.type.startsWith('image/'));
+      if (files.length > room) alert(`You can add ${Math.max(room, 0)} more image(s). Up to ${max} per product.`);
+      picked = picked.concat(files.slice(0, Math.max(room, 0))); sync();
+    });
+    gGrid.querySelectorAll('.gallery-item input[type=checkbox]').forEach(cb => cb.addEventListener('change', () => {
+      cb.closest('.gallery-item').classList.toggle('marked', cb.checked); sync();
+    }));
+  }
 
   // Password show/hide
   document.querySelectorAll('[data-toggle-pass]').forEach(b => b.addEventListener('click', () => {

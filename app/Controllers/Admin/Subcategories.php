@@ -9,9 +9,10 @@ class Subcategories extends AdminBase
 {
     public function index()
     {
-        $rows = (new SubcategoryModel())->select('subcategories.*, categories.name AS category_name')
-            ->join('categories', 'categories.id = subcategories.category_id')->orderBy('subcategories.id', 'DESC')->findAll();
-        return $this->render('subcategories/index', ['title' => 'Subcategories', 'rows' => $rows]);
+        $model = (new SubcategoryModel())->select('subcategories.*, categories.name AS category_name')
+            ->join('categories', 'categories.id = subcategories.category_id');
+        $data = $this->listing($model, ['subcategories.name', 'subcategories.slug', 'categories.name'], 'subcategories.id');
+        return $this->render('subcategories/index', ['title' => 'Subcategories'] + $data);
     }
 
     public function create()

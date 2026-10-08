@@ -16,8 +16,15 @@
       <div class="col-md-6" data-aos="fade-right">
         <div class="gallery-main position-relative">
           <?php if ($off): ?><span class="off-badge">-<?= $off ?>%</span><?php endif; ?>
-          <img src="<?= img_url($p['image']) ?>" alt="<?= esc($p['name']) ?>">
+          <img id="galleryMain" src="<?= img_url($images[0] ?? null) ?>" alt="<?= esc($p['name']) ?>">
         </div>
+        <?php if (count($images) > 1): ?>
+          <div class="gallery-thumbs" role="list">
+            <?php foreach ($images as $i => $img): ?>
+              <button type="button" class="gallery-thumb <?= $i === 0 ? 'active' : '' ?>" data-src="<?= img_url($img) ?>" aria-label="Show image <?= $i + 1 ?>"><img src="<?= img_url($img) ?>" alt="" loading="lazy"></button>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
       </div>
       <div class="col-md-6" data-aos="fade-left">
         <div class="text-muted-2 mb-1"><?= esc($p['category_name']) ?><?= $p['sku'] ? ' &middot; SKU ' . esc($p['sku']) : '' ?></div>

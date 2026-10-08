@@ -89,6 +89,9 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], static functio
         $routes->post('orders/status/(:num)', 'Orders::status/$1');
         $routes->get('orders/invoice/(:num)', 'Orders::invoice/$1');
 
+        $routes->get('reports', 'Reports::index');
+        $routes->get('reports/export', 'Reports::export');
+
         $routes->get('users', 'Users::index');
         $routes->post('users/toggle/(:num)', 'Users::toggle/$1');
         $routes->post('users/delete/(:num)', 'Users::delete/$1');

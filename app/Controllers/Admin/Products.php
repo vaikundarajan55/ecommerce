@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Libraries\Uploader;
 use App\Models\CategoryModel;
+use App\Models\ProductImageModel;
 use App\Models\ProductModel;
 use App\Models\SubcategoryModel;
 
@@ -17,24 +18,19 @@ class Products extends AdminBase
         'stock'       => 'required|integer',
         'short_desc'  => 'permit_empty|max_length[300]',
         'image'       => 'permit_empty|is_image[image]|max_size[image,3072]',
+        'gallery'     => 'permit_empty|is_image[gallery]|max_size[gallery,3072]',
     ];
+
+    /** Most extra images a product can have. */
+    private const MAX_GALLERY = 10;
 
     public function index()
     {
-        $model = new ProductModel();
-        $q     = trim((string) $this->request->getGet('q'));
-        $model->select('products.*, categories.name AS category_name, subcategories.name AS sub_name')
+        $model = (new ProductModel())->select('products.*, categories.name AS category_name, subcategories.name AS sub_name')
             ->join('categories', 'categories.id = products.category_id')
             ->join('subcategories', 'subcategories.id = products.subcategory_id', 'left');
-        if ($q !== '') {
-            $model->groupStart()->like('products.name', $q)->orLike('products.sku', $q)->groupEnd();
-        }
-        return $this->render('products/index', [
-            'title' => 'Products',
-            'rows'  => $model->orderBy('products.id', 'DESC')->paginate(10),
-            'pager' => $model->pager,
-            'q'     => $q,
-        ]);
+        $data = $this->listing($model, ['products.name', 'products.sku', 'categories.name', 'subcategories.name'], 'products.id');
+        return $this->render('products/index', ['title' => 'Products'] + $data);
     }
 
     public function create()
@@ -51,8 +47,9 @@ class Products extends AdminBase
         $data  = $this->collect();
         $data['slug']  = $this->uniqueSlug($model, $data['name']);
         $data['image'] = Uploader::image($this->request->getFile('image'), 'products');
-        $model->insert($data);
-        return redirect()->to(base_url('admin/products'))->with('success', 'Product added.');
+        $id    = $model->insert($data);
+        $added = $this->saveGallery((int) $id);
+        return redirect()->to(base_url('admin/products'))->with('success', 'Product added' . ($added ? " with $added extra image(s)." : '.'));
     }
 
     public function edit(int $id)
@@ -72,6 +69,8 @@ class Products extends AdminBase
         $data['slug']  = $data['name'] === $row['name'] ? $row['slug'] : $this->uniqueSlug($model, $data['name'], $id);
         $data['image'] = Uploader::image($this->request->getFile('image'), 'products', $row['image']);
         $model->update($id, $data);
+        $this->removeGallery($id, (array) $this->request->getPost('remove_gallery'));
+        $this->saveGallery($id);
         return redirect()->to(base_url('admin/products'))->with('success', 'Product updated.');
     }
 
@@ -80,6 +79,7 @@ class Products extends AdminBase
         $model = new ProductModel();
         if ($row = $model->find($id)) {
             Uploader::delete($row['image'], 'products');
+            $this->removeGallery($id);
             $model->delete($id);
         }
         return redirect()->to(base_url('admin/products'))->with('success', 'Product deleted.');
@@ -100,9 +100,47 @@ class Products extends AdminBase
         return [
             'title'      => $title,
             'row'        => $row,
+            'gallery'    => $row ? (new ProductImageModel())->forProduct((int) $row['id']) : [],
+            'maxGallery' => self::MAX_GALLERY,
             'categories' => (new CategoryModel())->findAll(),
             'subs'       => (new SubcategoryModel())->findAll(),
         ];
+    }
+
+    /** Store the uploaded gallery[] files (up to MAX_GALLERY per product). Returns how many were saved. */
+    private function saveGallery(int $productId): int
+    {
+        $model = new ProductImageModel();
+        $have  = $model->where('product_id', $productId)->countAllResults();
+        $order = (int) ($model->selectMax('sort_order')->where('product_id', $productId)->first()['sort_order'] ?? 0);
+        $saved = 0;
+        foreach ($this->request->getFileMultiple('gallery') ?? [] as $file) {
+            if ($have + $saved >= self::MAX_GALLERY) {
+                break;
+            }
+            if ($name = Uploader::image($file, 'products')) {
+                $model->insert(['product_id' => $productId, 'image' => $name, 'sort_order' => ++$order]);
+                $saved++;
+            }
+        }
+        return $saved;
+    }
+
+    /** Delete gallery images of a product: the given ids, or all of them when $ids is null. */
+    private function removeGallery(int $productId, ?array $ids = null): void
+    {
+        if ($ids === []) {
+            return;
+        }
+        $model = new ProductImageModel();
+        $model->where('product_id', $productId);
+        if ($ids !== null) {
+            $model->whereIn('id', array_map('intval', $ids));
+        }
+        foreach ($model->findAll() as $img) {
+            Uploader::delete($img['image'], 'products');
+            $model->delete($img['id']);
+        }
     }
 
     private function uniqueSlug(ProductModel $m, string $name, int $ignore = 0): string
