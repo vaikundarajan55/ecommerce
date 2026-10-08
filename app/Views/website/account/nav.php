@@ -1,7 +1,24 @@
-<div class="list-group acc-nav">
-  <a class="list-group-item <?= is_active('account') && ! str_contains(uri_string(), '/') ? 'active' : '' ?>" href="<?= base_url('account') ?>"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
-  <a class="list-group-item <?= str_contains(uri_string(), 'orders') || str_contains(uri_string(), 'invoice') ? 'active' : '' ?>" href="<?= base_url('account/orders') ?>"><i class="bi bi-box-seam me-2"></i>My orders</a>
-  <a class="list-group-item <?= str_contains(uri_string(), 'profile') ? 'active' : '' ?>" href="<?= base_url('account/profile') ?>"><i class="bi bi-person me-2"></i>Profile</a>
-  <a class="list-group-item <?= str_contains(uri_string(), 'change-password') ? 'active' : '' ?>" href="<?= base_url('account/change-password') ?>"><i class="bi bi-key me-2"></i>Change password</a>
-  <a class="list-group-item text-danger" href="<?= base_url('logout') ?>"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
-</div>
+<?php
+$uri   = uri_string();
+$name  = (string) session('user_name');
+$init  = strtoupper(implode('', array_map(static fn ($w) => $w[0] ?? '', array_slice(preg_split('/\s+/', trim($name) ?: 'U'), 0, 2))));
+// [url, icon, label, active]
+$links = [
+    ['account', 'bi-speedometer2', 'Dashboard', $uri === 'account'],
+    ['account/orders', 'bi-box-seam', 'My orders', str_contains($uri, 'orders') || str_contains($uri, 'invoice')],
+    ['account/profile', 'bi-person', 'Profile', str_contains($uri, 'profile')],
+    ['account/change-password', 'bi-key', 'Change password', str_contains($uri, 'change-password')],
+];
+?>
+<nav class="acc-nav" aria-label="My account">
+  <div class="acc-user">
+    <span class="acc-avatar"><?= esc($init) ?></span>
+    <div class="min-w-0"><div class="acc-name"><?= esc($name ?: 'My account') ?></div><small>Customer account</small></div>
+  </div>
+  <div class="acc-links">
+    <?php foreach ($links as $i => [$url, $icon, $label, $on]): ?>
+      <a class="acc-link <?= $on ? 'active' : '' ?>" href="<?= base_url($url) ?>" style="--i: <?= $i ?>"<?= $on ? ' aria-current="page"' : '' ?>><i class="bi <?= $icon ?>"></i><span><?= $label ?></span><i class="bi bi-chevron-right acc-arrow"></i></a>
+    <?php endforeach; ?>
+    <a class="acc-link acc-logout" href="<?= base_url('logout') ?>" style="--i: <?= count($links) ?>"><i class="bi bi-box-arrow-right"></i><span>Logout</span><i class="bi bi-chevron-right acc-arrow"></i></a>
+  </div>
+</nav>

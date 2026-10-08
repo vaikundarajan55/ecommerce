@@ -19,8 +19,10 @@ class Account extends BaseController
             'user'    => (new UserModel())->find($uid),
             'total'   => $orders->where('user_id', $uid)->countAllResults(),
             'pending' => $orders->where('user_id', $uid)->whereIn('status', ['placed', 'processing', 'shipped'])->countAllResults(),
+            'done'    => $orders->where(['user_id' => $uid, 'status' => 'delivered'])->countAllResults(),
+            'cancel'  => $orders->where(['user_id' => $uid, 'status' => 'cancelled'])->countAllResults(),
             'spent'   => (float) ($orders->selectSum('total')->where(['user_id' => $uid, 'payment_status' => 'paid'])->first()['total'] ?? 0),
-            'recent'  => $orders->where('user_id', $uid)->orderBy('id', 'DESC')->findAll(5),
+            'recent'  => $this->withItems($orders)->where('user_id', $uid)->orderBy('id', 'DESC')->findAll(5),
         ]);
     }
 
@@ -48,11 +50,22 @@ class Account extends BaseController
 
     public function orders()
     {
+        $sizes = [5, 10, 20];
+        $per   = (int) $this->request->getGet('per_page');
+        $per   = in_array($per, $sizes, true) ? $per : 10;
         $model = new OrderModel();
+        $rows  = $this->withItems($model)->where('user_id', session('user_id'))->orderBy('id', 'DESC')->paginate($per);
+        $total = $model->pager->getTotal();
+        $from  = $total ? ($model->pager->getCurrentPage() - 1) * $per + 1 : 0;
         return view('website/account/orders', [
-            'title'  => 'My orders',
-            'orders' => $model->where('user_id', session('user_id'))->orderBy('id', 'DESC')->paginate(10),
-            'pager'  => $model->pager,
+            'title'   => 'My orders',
+            'orders'  => $rows,
+            'pager'   => $model->pager,
+            'perPage' => $per,
+            'sizes'   => $sizes,
+            'total'   => $total,
+            'from'    => $from,
+            'to'      => $total ? $from + count($rows) - 1 : 0,
         ]);
     }
 
@@ -95,5 +108,17 @@ class Account extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
         return [$order, (new OrderItemModel())->where('order_id', $id)->findAll()];
+    }
+
+    /** Add first item name, item count and total quantity to an orders query (for the order tables). */
+    private function withItems(OrderModel $m): OrderModel
+    {
+        return $m->select(
+            'orders.*,
+             (SELECT i.name FROM order_items i WHERE i.order_id = orders.id ORDER BY i.id LIMIT 1) first_item,
+             (SELECT COUNT(*) FROM order_items i WHERE i.order_id = orders.id) item_count,
+             (SELECT COALESCE(SUM(i.qty), 0) FROM order_items i WHERE i.order_id = orders.id) qty',
+            false
+        );
     }
 }

@@ -15,7 +15,7 @@ class Categories extends AdminBase
             false
         );
         $data = $this->listing($model, ['categories.name', 'categories.slug'], 'categories.id');
-        return $this->render('categories/index', ['title' => 'Categories'] + $data);
+        return $this->render('categories/index', ['title' => 'Categories', 'stats' => $this->statusCounts('categories')] + $data);
     }
 
     public function create()

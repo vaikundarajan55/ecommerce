@@ -2,6 +2,35 @@ document.addEventListener('DOMContentLoaded', () => {
   // AOS scroll reveal (loaded from CDN in layout)
   if (window.AOS) { AOS.init({ duration: 600, once: true, offset: 40 }); }
 
+  // Account metrics: reveal cards, fill bars and count numbers up when scrolled into view
+  const countUp = el => {
+    const target = parseFloat(el.dataset.count), t0 = performance.now(), dur = 1200;
+    const tick = now => { const p = Math.min((now - t0) / dur, 1); el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  };
+  const metrics = document.querySelectorAll('.metrics-card');
+  const showMetrics = box => { box.classList.add('in'); box.querySelectorAll('[data-count]').forEach(countUp); };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { showMetrics(e.target); io.unobserve(e.target); } }), { threshold: .15 });
+    metrics.forEach(m => io.observe(m));
+  } else {
+    metrics.forEach(showMetrics);
+  }
+
+  // Show / hide password fields
+  document.querySelectorAll('[data-toggle-pass]').forEach(b => b.addEventListener('click', () => {
+    const i = document.querySelector(b.dataset.togglePass), show = i.type === 'password';
+    i.type = show ? 'text' : 'password';
+    b.querySelector('i').className = 'bi ' + (show ? 'bi-eye-slash' : 'bi-eye');
+    b.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  }));
+
+  // Sticky menu bar: compact + shadow once the page scrolls; footer back-to-top button
+  const nav = document.getElementById('siteNav');
+  const onScroll = () => nav && nav.classList.toggle('scrolled', window.scrollY > 40);
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  document.getElementById('toTop')?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
   // Quantity +/- steppers
   document.querySelectorAll('.qty-box').forEach(box => {
     const input = box.querySelector('input');
@@ -25,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Confetti on success page
   const c = document.querySelector('.confetti');
   if (c) {
-    const colors = ['#0b6e6e', '#f5a524', '#d94a2b', '#1a9e5c', '#16222b'];
+    const colors = ['#1d6fe0', '#06b6d4', '#0e9f6e', '#f59e0b', '#f43f5e'];
     for (let i = 0; i < 46; i++) {
       const p = document.createElement('i');
       p.style.left = Math.random() * 100 + '%';

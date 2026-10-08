@@ -30,7 +30,7 @@ class Products extends AdminBase
             ->join('categories', 'categories.id = products.category_id')
             ->join('subcategories', 'subcategories.id = products.subcategory_id', 'left');
         $data = $this->listing($model, ['products.name', 'products.sku', 'categories.name', 'subcategories.name'], 'products.id');
-        return $this->render('products/index', ['title' => 'Products'] + $data);
+        return $this->render('products/index', ['title' => 'Products', 'stats' => $this->statusCounts('products')] + $data);
     }
 
     public function create()

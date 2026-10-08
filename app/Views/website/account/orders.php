@@ -5,17 +5,26 @@
   <div class="col-lg-3"><?= $this->include('website/account/nav') ?></div>
   <div class="col-lg-9">
     <?php if ($orders): ?>
-    <div class="table-responsive"><table class="table align-middle">
-      <thead><tr><th>Order</th><th>Date</th><th>Total</th><th>Payment</th><th>Status</th><th></th></tr></thead>
-      <tbody><?php foreach ($orders as $o): ?>
-        <tr><td class="fw-bold"><?= esc($o['order_no']) ?></td><td><?= date('d M Y', strtotime($o['created_at'])) ?></td><td><?= money($o['total']) ?></td><td><?= status_badge($o['payment_status']) ?></td><td><?= status_badge($o['status']) ?></td>
-        <td class="text-end text-nowrap">
-          <a class="btn btn-sm btn-outline-brand" href="<?= base_url('account/orders/' . $o['id']) ?>">View</a>
-          <a class="btn btn-sm btn-brand" href="<?= base_url('account/invoice/' . $o['id']) ?>">Invoice</a>
-          <?php if ($o['payment_status'] !== 'paid'): ?><a class="btn btn-sm btn-accent" href="<?= base_url('payment/' . $o['order_no']) ?>">Pay now</a><?php endif; ?></td></tr>
-      <?php endforeach; ?></tbody>
-    </table></div>
-    <?= $pager->links('default', 'bootstrap_full') ?>
+    <section class="order-card">
+      <div class="order-head">
+        <div><h2 class="metrics-title">Order history</h2><p class="metrics-sub mb-0">Every order you have placed, with payment status and delivery progress</p></div>
+      </div>
+      <?= view('website/account/orders_table', ['orders' => $orders]) ?>
+      <div class="order-foot">
+        <form method="get" class="d-flex align-items-center gap-2">
+          <label for="perPage" class="mb-0">Rows per page:</label>
+          <select id="perPage" name="per_page" class="rows-select" onchange="this.form.submit()">
+            <?php foreach ($sizes as $s): ?><option value="<?= $s ?>" <?= $perPage === $s ? 'selected' : '' ?>><?= $s ?></option><?php endforeach; ?>
+          </select>
+        </form>
+        <span><?= $from ?>–<?= $to ?> of <?= $total ?></span>
+        <div class="d-flex gap-1">
+          <?php $prev = $pager->getPreviousPageURI(); $next = $pager->getNextPageURI(); ?>
+          <a class="page-arrow <?= $prev ? '' : 'disabled' ?>" href="<?= $prev ?? '#' ?>" aria-label="Previous page"><i class="bi bi-chevron-left"></i></a>
+          <a class="page-arrow <?= $next ? '' : 'disabled' ?>" href="<?= $next ?? '#' ?>" aria-label="Next page"><i class="bi bi-chevron-right"></i></a>
+        </div>
+      </div>
+    </section>
     <?php else: ?><div class="text-center py-5"><i class="bi bi-box fs-1 text-muted-2"></i><h5 class="mt-2">No orders yet</h5><a href="<?= base_url('shop') ?>" class="btn btn-brand">Browse products</a></div><?php endif; ?>
   </div>
 </div></div></section>

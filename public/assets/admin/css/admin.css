@@ -328,3 +328,37 @@ h1,h2,h3,h4,h5,.brand-font { font-family: 'Bricolage Grotesque', sans-serif; let
   .reveal, .table-reveal tbody tr { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
   .chart-card::before, .kpi-dot, .table-reveal thead th::after, .donut-center { animation: none !important; }
 }
+
+/* ---------- Status metrics (above list cards) ---------- */
+.metrics-card { padding: 22px; margin-bottom: 26px; border: 1px solid #dbe6fb; }
+.metric { --c: #2563eb; --c2: #1d4ed8; --tint: #eef4ff; position: relative; overflow: hidden; height: 100%; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;
+  padding: 22px 22px 22px 24px; border-radius: 16px; border: 1px solid var(--c); border-left-width: 5px; border-top-width: 3px;
+  background: linear-gradient(120deg, #fff 35%, var(--tint)); transition: transform .25s, box-shadow .25s; }
+.metric:hover { transform: translateY(-4px); box-shadow: 0 14px 28px color-mix(in srgb, var(--c) 18%, transparent); }
+.m-green { --c: #059669; --c2: #047857; --tint: #ecfdf5; }
+.m-amber { --c: #d97706; --c2: #c2410c; --tint: #fff7ed; }
+.metric-body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.metric-label { font-size: .95rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #0f1b2d; }
+.metric-num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 3rem; font-weight: 800; line-height: 1.05; color: #0f1b2d; margin: 2px 0 4px; }
+.metric-caption { color: var(--c); font-weight: 800; font-size: .92rem; }
+.metric-bar { display: block; height: 4px; margin-top: 8px; border-radius: 99px; background: color-mix(in srgb, var(--c) 12%, transparent); overflow: hidden; }
+.metric-bar > span { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--c); transition: width 1.2s cubic-bezier(.2,.7,.2,1) calc(var(--rd, 0ms) + 300ms); }
+.in .metric-bar > span { width: var(--w); }
+.metric-ico { width: 68px; height: 68px; border-radius: 16px; display: grid; place-items: center; flex: none; color: #fff; font-size: 1.7rem;
+  background: linear-gradient(135deg, var(--c), var(--c2)); box-shadow: 0 10px 22px color-mix(in srgb, var(--c) 35%, transparent); transition: transform .25s; }
+.metric:hover .metric-ico { transform: rotate(-6deg) scale(1.05); }
+.metric-dot { position: absolute; right: 14px; bottom: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--c) 15%, transparent); animation: dotPulse 2.4s ease-in-out infinite; }
+@media (max-width: 575.98px) { .metric-num { font-size: 2.4rem; } .metric-ico { width: 56px; height: 56px; font-size: 1.4rem; } }
+
+/* Created / modified date cell */
+.date-cell { white-space: nowrap; font-weight: 600; }
+.date-cell small { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px; }
+
+/* Row "⋮" actions menu */
+.kebab { width: 36px; height: 36px; border: 0; border-radius: 10px; background: transparent; color: #4b5a62; font-size: 1.15rem; display: inline-grid; place-items: center; transition: background .15s, color .15s; }
+.kebab:hover, .kebab[aria-expanded="true"] { background: #eef4fb; color: #1d6fe0; }
+.row-menu .nav-drop { min-width: 170px; }
+.row-menu form { margin: 0; }
+.row-menu button.dropdown-item { width: 100%; background: none; border: 0; text-align: left; }
+.row-menu .dropdown-item.text-danger:hover { background: #fdecec; color: #c0352b; }

@@ -10,7 +10,7 @@ class Users extends AdminBase
     {
         $model = (new UserModel())->select('users.*, (SELECT COUNT(*) FROM orders o WHERE o.user_id = users.id) AS order_count');
         $data  = $this->listing($model, ['name', 'email', 'phone', 'city'], 'id');
-        return $this->render('users/index', ['title' => 'Users'] + $data);
+        return $this->render('users/index', ['title' => 'Users', 'stats' => $this->statusCounts('users')] + $data);
     }
 
     public function toggle(int $id)

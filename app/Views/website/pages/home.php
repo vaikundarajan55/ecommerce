@@ -70,7 +70,7 @@
 <!-- Promo -->
 <section class="section">
   <div class="container">
-    <div class="rounded-4 p-4 p-md-5 text-white position-relative overflow-hidden" style="background:linear-gradient(120deg,#0b6e6e,#16222b)" data-aos="fade-up">
+    <div class="promo-band p-4 p-md-5" data-aos="fade-up">
       <span class="hero-shape s1"></span>
       <div class="row align-items-center position-relative">
         <div class="col-md-8"><h2 class="fw-bold">Have a question about a product?</h2><p class="mb-0 opacity-75">Every product page has an enquiry form. Send it and we reply within one working day.</p></div>

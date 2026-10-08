@@ -15,6 +15,15 @@ abstract class AdminBase extends BaseController
         return view('admin/' . $view, $data);
     }
 
+    /** Total / active / inactive record counts for the status metrics cards. */
+    protected function statusCounts(string $table): array
+    {
+        $row = db_connect()->table($table)->select('COUNT(*) total, COALESCE(SUM(status = 1), 0) active', false)->get()->getRowArray();
+        $total  = (int) $row['total'];
+        $active = (int) $row['active'];
+        return ['total' => $total, 'active' => $active, 'inactive' => $total - $active];
+    }
+
     /**
      * Apply the ?q= search and ?per_page= size to a prepared model query and fetch the rows.
      * Returns the data the list views and the table_toolbar / table_footer partials expect.

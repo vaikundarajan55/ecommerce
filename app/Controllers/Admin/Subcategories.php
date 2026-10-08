@@ -12,7 +12,7 @@ class Subcategories extends AdminBase
         $model = (new SubcategoryModel())->select('subcategories.*, categories.name AS category_name')
             ->join('categories', 'categories.id = subcategories.category_id');
         $data = $this->listing($model, ['subcategories.name', 'subcategories.slug', 'categories.name'], 'subcategories.id');
-        return $this->render('subcategories/index', ['title' => 'Subcategories'] + $data);
+        return $this->render('subcategories/index', ['title' => 'Subcategories', 'stats' => $this->statusCounts('subcategories')] + $data);
     }
 
     public function create()

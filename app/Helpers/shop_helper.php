@@ -116,7 +116,7 @@ if (! function_exists('nav_categories')) {
 if (! function_exists('is_active')) {
     function is_active(string $path): string
     {
-        $uri = trim(service('request')->getUri()->getPath(), '/');
+        $uri = trim(uri_string(), '/'); // relative to baseURL, so it works when the site lives in a subfolder
         return ($path === '' ? $uri === '' : str_starts_with($uri, $path)) ? 'active' : '';
     }
 }
@@ -125,5 +125,25 @@ if (! function_exists('delete_form')) {
     function delete_form(string $action, string $msg = 'Delete this item? This cannot be undone.'): string
     {
         return view('admin/partials/delete_form', ['action' => $action, 'msg' => $msg], ['saveData' => false]);
+    }
+}
+
+if (! function_exists('row_menu')) {
+    /** "⋮" actions dropdown for admin table rows. See admin/partials/row_menu for the $items format. */
+    function row_menu(array $items): string
+    {
+        return view('admin/partials/row_menu', ['items' => $items], ['saveData' => false]);
+    }
+}
+
+if (! function_exists('date_cell')) {
+    /** Date with the time underneath, for admin list tables. */
+    function date_cell(?string $dt): string
+    {
+        if (! $dt) {
+            return '<span class="text-muted">—</span>';
+        }
+        $t = strtotime($dt);
+        return '<div class="date-cell">' . date('n/j/Y', $t) . '<small>' . date('h:i A', $t) . '</small></div>';
     }
 }

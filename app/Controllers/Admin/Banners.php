@@ -18,7 +18,7 @@ class Banners extends AdminBase
     public function index()
     {
         $data = $this->listing(new BannerModel(), ['title', 'subtitle', 'link'], 'sort_order', 'ASC');
-        return $this->render('banners/index', ['title' => 'Banners'] + $data);
+        return $this->render('banners/index', ['title' => 'Banners', 'stats' => $this->statusCounts('banners')] + $data);
     }
 
     public function create()
