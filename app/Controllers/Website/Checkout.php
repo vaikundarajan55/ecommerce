@@ -65,6 +65,7 @@ class Checkout extends BaseController
             'payment_method' => 'dummy_gateway',
             'payment_status' => 'pending',
             'status'         => 'placed',
+            'ip_address'     => client_ip(),
         ]);
         $orderItems = new OrderItemModel();
         foreach ($items as $i) {

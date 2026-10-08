@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS ecommerce_ci4 CHARACTER SET utf8mb4 COLLATE utf8mb
 USE ecommerce_ci4;
 
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS product_images, order_items, orders, enquiries, contacts, testimonials, settings, products, subcategories, categories, banners, users, admins;
+DROP TABLE IF EXISTS visitor_page_views, visitors, product_images, order_items, orders, enquiries, contacts, testimonials, settings, products, subcategories, categories, banners, users, admins;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE admins (
@@ -112,6 +112,7 @@ CREATE TABLE orders (
   payment_method VARCHAR(30) NOT NULL DEFAULT 'dummy_gateway',
   payment_status ENUM('pending','paid','failed') NOT NULL DEFAULT 'pending',
   txn_id VARCHAR(60) NULL,
+  ip_address VARCHAR(45) NULL,
   status ENUM('placed','processing','shipped','delivered','cancelled') NOT NULL DEFAULT 'placed',
   created_at DATETIME NULL,
   updated_at DATETIME NULL,
@@ -160,6 +161,29 @@ CREATE TABLE testimonials (
   status TINYINT(1) NOT NULL DEFAULT 1,
   created_at DATETIME NULL,
   updated_at DATETIME NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE visitors (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  ip_address VARCHAR(45) NOT NULL,
+  visit_date DATE NOT NULL,
+  user_id INT UNSIGNED NULL,
+  user_agent VARCHAR(255) NULL,
+  last_page VARCHAR(255) NULL,
+  hits INT UNSIGNED NOT NULL DEFAULT 1,
+  created_at DATETIME NULL,
+  updated_at DATETIME NULL,
+  UNIQUE KEY ip_day (ip_address, visit_date),
+  KEY visit_date (visit_date)
+) ENGINE=InnoDB;
+
+CREATE TABLE visitor_page_views (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  visitor_id INT UNSIGNED NOT NULL,
+  page VARCHAR(255) NOT NULL,
+  viewed_at DATETIME NOT NULL,
+  KEY visitor_id (visitor_id),
+  FOREIGN KEY (visitor_id) REFERENCES visitors(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------- Sample data ----------------

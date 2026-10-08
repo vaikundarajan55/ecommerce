@@ -412,3 +412,25 @@ h1,h2,h3,h4,h5,.brand-font { font-family: 'Bricolage Grotesque', sans-serif; let
 /* Product form: home page tag switches */
 .tag-box { border: 1px dashed #c9d9f2; border-radius: 14px; padding: 12px 14px; background: #f8fbff; display: grid; gap: 6px; }
 .tag-box-title { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+
+/* Visitors: page views popup */
+.views-modal .modal-content { border: 0; border-radius: 20px; overflow: hidden; box-shadow: 0 24px 60px rgba(30,50,90,.25); }
+.vm-head { display: flex; align-items: center; gap: 14px; padding: 20px 22px; background: linear-gradient(135deg, #eef4ff 0%, #ecfbfd 55%, #ecf9f3 100%); border-bottom: 1px solid var(--line); }
+.vm-head .hero-icon { width: 50px; height: 50px; font-size: 1.4rem; border-radius: 14px; }
+.vm-heading { flex: 1; min-width: 0; }
+.vm-kicker { display: block; font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.vm-title { margin: 0; font-size: 1.35rem; font-weight: 800; overflow-wrap: anywhere; }
+.vm-close { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); display: grid; place-items: center; flex: none; transition: background .15s, color .15s; }
+.vm-close:hover { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+.vm-chips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 16px 22px 4px; }
+.vm-chip { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: #fafcfc; min-width: 0; }
+.vm-chip > i { grid-row: span 2; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; color: #fff; background: var(--grad); }
+.vm-chip-label { font-size: .72rem; font-weight: 700; color: var(--muted); }
+.vm-chip strong { font-size: .95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.views-modal .modal-body { padding: 16px 22px; }
+.vm-foot { display: flex; justify-content: flex-end; padding: 14px 22px; border-top: 1px solid var(--line); background: #fafcfc; }
+.views-modal .list-table .table { min-width: 0; }
+.views-modal .list-table .table tbody td { padding: 12px 16px; }
+.vm-page { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; overflow-wrap: anywhere; }
+.vm-page i { color: #1d6fe0; font-size: 1.1rem; flex: none; }
+@media (max-width: 767.98px) { .vm-chips { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

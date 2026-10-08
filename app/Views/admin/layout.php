@@ -26,6 +26,7 @@
       ['admin/orders', 'bi-receipt', 'Orders', 0],
       ['admin/users', 'bi-people', 'Users', 0],
       ['admin/reports', 'bi-bar-chart-line', 'Reports', 0],
+      ['admin/visitors', 'bi-globe', 'Visitors & IPs', 0],
     ]],
     ['Website', 'bi-globe2', [
       ['admin/website/about', 'bi-info-circle', 'About us page', 0],
@@ -47,6 +48,7 @@
     'admin/orders'          => ['bi-receipt', 'Review and manage customer orders'],
     'admin/users'           => ['bi-people', 'Registered customers and their accounts'],
     'admin/reports'         => ['bi-bar-chart-line', 'Sales reports by year and month'],
+    'admin/visitors'        => ['bi-globe', 'Website visitors and the network IPs behind visits and purchases'],
     'admin/enquiries'       => ['bi-inbox', 'Product questions and contact us messages in one inbox'],
     'admin/website'         => ['bi-globe2', 'Content shown on the website'],
     'admin/testimonials'    => ['bi-chat-quote', 'Customer testimonials shown on the website'],

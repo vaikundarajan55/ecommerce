@@ -7,6 +7,26 @@ if (! function_exists('money')) {
     }
 }
 
+if (! function_exists('client_ip')) {
+    /**
+     * Visitor IP in IPv4 dotted format (e.g. 192.168.10.243).
+     * "::ffff:192.168.10.243" is unwrapped, and localhost (::1 / 127.0.0.1) becomes this server's LAN IP.
+     */
+    function client_ip(): string
+    {
+        $ip = service('request')->getIPAddress();
+
+        if (stripos($ip, '::ffff:') === 0 && filter_var(substr($ip, 7), FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ip = substr($ip, 7);
+        }
+        if ($ip === '::1' || str_starts_with($ip, '127.')) {
+            $lan = gethostbyname(gethostname());
+            $ip  = filter_var($lan, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && ! str_starts_with($lan, '127.') ? $lan : '127.0.0.1';
+        }
+        return $ip;
+    }
+}
+
 if (! function_exists('img_url')) {
     /** Returns the public URL of an uploaded image, or a placeholder. */
     function img_url(?string $file, string $folder = 'products'): string

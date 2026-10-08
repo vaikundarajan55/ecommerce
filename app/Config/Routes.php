@@ -10,7 +10,7 @@ use CodeIgniter\Router\RouteCollection;
 // Website (front end)
 // ------------------------------------------------------------------
 // URL: http://localhost/ecommerce/        -> app/Controllers/Website, app/Views/website
-$routes->group('', ['namespace' => 'App\Controllers\Website'], static function ($routes) {
+$routes->group('', ['namespace' => 'App\Controllers\Website', 'filter' => 'visitorTrack'], static function ($routes) {
     $routes->get('/', 'Home::index');
     $routes->get('about', 'Home::about');
     $routes->get('contact', 'Home::contact');
@@ -91,6 +91,9 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], static functio
 
         $routes->get('reports', 'Reports::index');
         $routes->get('reports/export', 'Reports::export');
+
+        $routes->get('visitors', 'Visitors::index');
+        $routes->get('visitors/pages/(:num)', 'Visitors::pages/$1');
 
         $routes->get('users', 'Users::index');
         $routes->post('users/toggle/(:num)', 'Users::toggle/$1');
