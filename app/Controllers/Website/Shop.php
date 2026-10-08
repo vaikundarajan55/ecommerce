@@ -33,6 +33,14 @@ class Shop extends BaseController
         if ($subSlug && ($activeSub = $subs->where('slug', $subSlug)->first())) {
             $model->where('products.subcategory_id', $activeSub['id']);
         }
+        // Home page sections link here: ?tag=featured | current | peak
+        $tags = ['featured' => ['featured', 'Featured products'], 'current' => ['is_current', 'Trending now'], 'peak' => ['is_peak', 'Best sellers']];
+        $tag  = (string) $this->request->getGet('tag');
+        if (isset($tags[$tag])) {
+            $model->where('products.' . $tags[$tag][0], 1);
+        } else {
+            $tag = '';
+        }
         if ($q !== '') {
             $model->groupStart()->like('products.name', $q)->orLike('products.short_desc', $q)->groupEnd();
         }
@@ -53,6 +61,8 @@ class Shop extends BaseController
             'activeSub'  => $activeSub,
             'q'          => $q,
             'sort'       => $sort,
+            'tag'        => $tag,
+            'tagTitle'   => $tag ? $tags[$tag][1] : null,
         ]);
     }
 

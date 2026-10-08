@@ -22,7 +22,12 @@
       <div class="col-6"><label class="form-label">Sale price (₹)</label><input type="number" step="0.01" min="0" class="form-control" name="sale_price" value="<?= $v('sale_price') ?>"></div>
       <div class="col-6"><label class="form-label">Stock</label><input type="number" min="0" class="form-control" name="stock" value="<?= $v('stock', 0) ?>" required></div>
       <div class="col-6"><label class="form-label">SKU</label><input class="form-control" name="sku" value="<?= $v('sku') ?>"></div>
-      <div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="featured" id="ft" value="1" <?= ($row['featured'] ?? 0) ? 'checked' : '' ?>><label class="form-check-label" for="ft">Featured on home page</label></div></div>
+      <div class="col-12"><div class="tag-box">
+        <span class="tag-box-title">Show on home page</span>
+        <?php foreach ([['featured', 'ft', 'bi-star-fill', 'Featured', 'Featured products'], ['is_current', 'cu', 'bi-lightning-charge-fill', 'Current', 'Trending now'], ['is_peak', 'pk', 'bi-fire', 'Peak', 'Best sellers']] as [$f, $id, $ic, $lbl, $sec]): ?>
+          <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="<?= $f ?>" id="<?= $id ?>" value="1" <?= ($row[$f] ?? 0) ? 'checked' : '' ?>><label class="form-check-label" for="<?= $id ?>"><i class="bi <?= $ic ?> me-1"></i><?= $lbl ?> <span class="text-muted small">— “<?= $sec ?>” section</span></label></div>
+        <?php endforeach; ?>
+      </div></div>
       <div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="status" id="st" value="1" <?= ($row['status'] ?? 1) ? 'checked' : '' ?>><label class="form-check-label" for="st">Active (visible in shop)</label></div></div>
     </div></div>
     <div class="panel"><div class="panel-body">

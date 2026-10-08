@@ -75,7 +75,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], static functio
     $routes->group('', ['filter' => 'adminAuth'], static function ($routes) {
         $routes->get('dashboard', 'Dashboard::index');
 
-        foreach (['banners' => 'Banners', 'categories' => 'Categories', 'subcategories' => 'Subcategories', 'products' => 'Products'] as $uri => $ctl) {
+        foreach (['banners' => 'Banners', 'categories' => 'Categories', 'subcategories' => 'Subcategories', 'products' => 'Products', 'testimonials' => 'Testimonials'] as $uri => $ctl) {
             $routes->get($uri, "$ctl::index");
             $routes->get("$uri/create", "$ctl::create");
             $routes->post("$uri/store", "$ctl::store");
@@ -100,9 +100,11 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], static functio
         $routes->get('enquiries/view/(:num)', 'Enquiries::view/$1');
         $routes->post('enquiries/delete/(:num)', 'Enquiries::delete/$1');
 
-        $routes->get('contacts', 'Contacts::index');
-        $routes->get('contacts/view/(:num)', 'Contacts::view/$1');
-        $routes->post('contacts/delete/(:num)', 'Contacts::delete/$1');
+        // Website content: About us page and contact details
+        $routes->get('website/about', 'Website::about');
+        $routes->post('website/about', 'Website::saveAbout');
+        $routes->get('website/contact', 'Website::contact');
+        $routes->post('website/contact', 'Website::saveContact');
 
         $routes->get('change-password', 'Password::index');
         $routes->post('change-password', 'Password::update');

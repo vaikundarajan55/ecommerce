@@ -52,20 +52,9 @@
   </div>
 </section>
 
-<!-- Featured -->
-<section class="section section-alt">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-end mb-4">
-      <h2 class="section-title mb-0" data-aos="fade-up">Featured products</h2>
-      <a class="link-more" href="<?= base_url('shop') ?>">View all products</a>
-    </div>
-    <div class="row g-3 g-lg-4">
-      <?php foreach ($featured as $n => $p): ?>
-        <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="<?= ($n % 4) * 80 ?>"><?= product_card($p) ?></div>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</section>
+<!-- Product sections, tagged in Admin > Products (Featured / Current / Peak) -->
+<?= view('website/partials/product_section', ['title' => 'Featured products', 'eyebrow' => 'Hand-picked', 'icon' => 'bi-star-fill', 'tone' => 'eb-amber', 'products' => $featured, 'link' => base_url('shop?tag=featured'), 'alt' => true]) ?>
+<?= view('website/partials/product_section', ['title' => 'Trending now', 'eyebrow' => 'Current picks', 'icon' => 'bi-lightning-charge-fill', 'products' => $current, 'link' => base_url('shop?tag=current')]) ?>
 
 <!-- Promo -->
 <section class="section">
@@ -80,8 +69,10 @@
   </div>
 </section>
 
+<?= view('website/partials/product_section', ['title' => 'Best sellers', 'eyebrow' => 'Peak products', 'icon' => 'bi-fire', 'tone' => 'eb-red', 'products' => $peak, 'link' => base_url('shop?tag=peak'), 'alt' => true]) ?>
+
 <!-- Latest -->
-<section class="section pt-0">
+<section class="section">
   <div class="container">
     <h2 class="section-title mb-4" data-aos="fade-up">Just arrived</h2>
     <div class="row g-3 g-lg-4">
@@ -91,4 +82,6 @@
     </div>
   </div>
 </section>
+
+<?= view('website/partials/testimonials', ['testimonials' => $testimonials, 'alt' => true]) ?>
 <?= $this->endSection() ?>

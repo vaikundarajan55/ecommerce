@@ -24,7 +24,7 @@
 <div class="invoice">
   <div class="d-flex justify-content-between align-items-start mb-4">
     <div><div class="inv-brand fw-bold"><i class="bi bi-bag-heart-fill me-1"></i><?= site_name() ?></div>
-      <div class="small text-muted">12 Beach Road, Puducherry 605001<br>support@shopkart.test &middot; +91 98765 43210</div></div>
+      <div class="small text-muted"><?= esc(setting('contact_address')) ?><br><?= esc(implode(' · ', array_filter([setting('contact_email'), setting('contact_phone')]))) ?></div></div>
     <div class="text-end"><div class="inv-title">INVOICE</div>
       <div class="small">No: <strong>INV-<?= esc($order['order_no']) ?></strong><br>Date: <?= date('d M Y', strtotime($order['created_at'])) ?></div></div>
   </div>

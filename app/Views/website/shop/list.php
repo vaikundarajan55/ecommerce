@@ -1,7 +1,7 @@
 <?= $this->extend('website/layout') ?>
 <?= $this->section('content') ?>
 <div class="page-head"><div class="container">
-  <h1 class="fw-bold mb-1"><?= esc($activeSub['name'] ?? $activeCat['name'] ?? ($q ? 'Results for “' . $q . '”' : 'All products')) ?></h1>
+  <h1 class="fw-bold mb-1"><?= esc($activeSub['name'] ?? $activeCat['name'] ?? ($q ? 'Results for “' . $q . '”' : ($tagTitle ?? 'All products'))) ?></h1>
   <nav aria-label="breadcrumb"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li><li class="breadcrumb-item"><a href="<?= base_url('shop') ?>">Shop</a></li><?php if ($activeCat): ?><li class="breadcrumb-item active"><?= esc($activeCat['name']) ?></li><?php endif; ?></ol></nav>
 </div></div>
 <section class="section pt-4">
@@ -32,6 +32,7 @@
           <?php if ($activeCat): ?><input type="hidden" name="cat" value="<?= esc($activeCat['slug']) ?>"><?php endif; ?>
           <?php if ($activeSub): ?><input type="hidden" name="sub" value="<?= esc($activeSub['slug']) ?>"><?php endif; ?>
           <?php if ($q): ?><input type="hidden" name="q" value="<?= esc($q) ?>"><?php endif; ?>
+          <?php if ($tag): ?><input type="hidden" name="tag" value="<?= esc($tag) ?>"><?php endif; ?>
           <span class="text-muted-2"><?= count($products) ?> products on this page</span>
           <select name="sort" class="form-select w-auto" onchange="this.form.submit()" aria-label="Sort products">
             <option value="">Newest first</option>

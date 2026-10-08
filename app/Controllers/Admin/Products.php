@@ -29,8 +29,12 @@ class Products extends AdminBase
         $model = (new ProductModel())->select('products.*, categories.name AS category_name, subcategories.name AS sub_name')
             ->join('categories', 'categories.id = products.category_id')
             ->join('subcategories', 'subcategories.id = products.subcategory_id', 'left');
+        $tag = (string) $this->request->getGet('tag');
+        if (in_array($tag, ['featured', 'is_current', 'is_peak'], true)) {
+            $model->where('products.' . $tag, 1);
+        }
         $data = $this->listing($model, ['products.name', 'products.sku', 'categories.name', 'subcategories.name'], 'products.id');
-        return $this->render('products/index', ['title' => 'Products', 'stats' => $this->statusCounts('products')] + $data);
+        return $this->render('products/index', ['title' => 'Products', 'stats' => $this->statusCounts('products'), 'tag' => $tag] + $data);
     }
 
     public function create()
@@ -91,6 +95,8 @@ class Products extends AdminBase
         $d['subcategory_id'] = $d['subcategory_id'] ?: null;
         $d['sale_price']     = ($d['sale_price'] !== '' && $d['sale_price'] !== null) ? $d['sale_price'] : null;
         $d['featured']       = $this->request->getPost('featured') ? 1 : 0;
+        $d['is_current']     = $this->request->getPost('is_current') ? 1 : 0;
+        $d['is_peak']        = $this->request->getPost('is_peak') ? 1 : 0;
         $d['status']         = $this->request->getPost('status') ? 1 : 0;
         return $d;
     }

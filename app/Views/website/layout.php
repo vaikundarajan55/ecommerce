@@ -17,13 +17,18 @@
   $userName = (string) session('user_name');
   $userInit = strtoupper(implode('', array_map(static fn ($w) => $w[0] ?? '', array_slice(preg_split('/\s+/', trim($userName) ?: 'U'), 0, 2))));
   $cartQty  = cart_count();
+  // Store contact details (Admin > Website > Contact details)
+  $cPhone   = setting('contact_phone');
+  $cEmail   = setting('contact_email');
+  $cAddress = setting('contact_address');
+  $cHours   = setting('contact_hours');
 ?>
 <div class="topstrip d-none d-md-block">
   <div class="container d-flex justify-content-between align-items-center">
     <span class="ts-item"><i class="bi bi-truck"></i>Free delivery on orders above ₹999</span>
     <div class="d-flex align-items-center gap-4">
-      <a class="ts-item" href="mailto:support@shopkart.test"><i class="bi bi-envelope"></i>support@shopkart.test</a>
-      <a class="ts-item" href="tel:+919876543210"><i class="bi bi-telephone"></i>+91 98765 43210</a>
+      <?php if ($cEmail): ?><a class="ts-item" href="mailto:<?= esc($cEmail) ?>"><i class="bi bi-envelope"></i><?= esc($cEmail) ?></a><?php endif; ?>
+      <?php if ($cPhone): ?><a class="ts-item" href="<?= esc(tel_link($cPhone)) ?>"><i class="bi bi-telephone"></i><?= esc($cPhone) ?></a><?php endif; ?>
     </div>
   </div>
 </div>
@@ -111,9 +116,10 @@
       <div class="col-lg-4" data-aos="fade-up" data-aos-delay="240">
         <h6 class="footer-title">Contact</h6>
         <ul class="footer-contact">
-          <li><span><i class="bi bi-geo-alt"></i></span>12 Beach Road, Puducherry 605001</li>
-          <li><span><i class="bi bi-envelope"></i></span><a href="mailto:support@shopkart.test">support@shopkart.test</a></li>
-          <li><span><i class="bi bi-telephone"></i></span><a href="tel:+919876543210">+91 98765 43210</a></li>
+          <?php if ($cAddress): ?><li><span><i class="bi bi-geo-alt"></i></span><?= esc($cAddress) ?></li><?php endif; ?>
+          <?php if ($cEmail): ?><li><span><i class="bi bi-envelope"></i></span><a href="mailto:<?= esc($cEmail) ?>"><?= esc($cEmail) ?></a></li><?php endif; ?>
+          <?php if ($cPhone): ?><li><span><i class="bi bi-telephone"></i></span><a href="<?= esc(tel_link($cPhone)) ?>"><?= esc($cPhone) ?></a></li><?php endif; ?>
+          <?php if ($cHours): ?><li><span><i class="bi bi-clock"></i></span><?= esc($cHours) ?></li><?php endif; ?>
         </ul>
       </div>
     </div>

@@ -147,3 +147,31 @@ if (! function_exists('date_cell')) {
         return '<div class="date-cell">' . date('n/j/Y', $t) . '<small>' . date('h:i A', $t) . '</small></div>';
     }
 }
+
+if (! function_exists('setting')) {
+    /** Editable website content (Admin > Website), loaded once per request. */
+    function setting(string $key, string $default = ''): string
+    {
+        static $all = null;
+        $all ??= (new \App\Models\SettingModel())->all();
+        $v = $all[$key] ?? null;
+        return $v === null || $v === '' ? $default : $v;
+    }
+}
+
+if (! function_exists('setting_list')) {
+    /** A setting stored as a JSON list (About us stats and promises). */
+    function setting_list(string $key): array
+    {
+        $list = json_decode(setting($key, '[]'), true);
+        return is_array($list) ? $list : [];
+    }
+}
+
+if (! function_exists('tel_link')) {
+    /** "+91 98765 43210" -> "tel:+919876543210" */
+    function tel_link(string $phone): string
+    {
+        return 'tel:' . preg_replace('/[^\d+]/', '', $phone);
+    }
+}

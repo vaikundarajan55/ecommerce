@@ -2,7 +2,6 @@
 
 namespace App\Controllers\Admin;
 
-use App\Models\ContactModel;
 use App\Models\EnquiryModel;
 use App\Models\OrderModel;
 use App\Models\ProductModel;
@@ -46,8 +45,8 @@ class Dashboard extends AdminBase
                 'revenue'   => (float) ($orders->selectSum('total')->where('payment_status', 'paid')->first()['total'] ?? 0),
                 'products'  => (new ProductModel())->countAllResults(),
                 'users'     => (new UserModel())->countAllResults(),
-                'enquiries' => (new EnquiryModel())->where('is_read', 0)->countAllResults(),
-                'contacts'  => (new ContactModel())->where('is_read', 0)->countAllResults(),
+                'enquiries' => (new EnquiryModel())->where(['is_read' => 0, 'source' => 'product'])->countAllResults(),
+                'contacts'  => (new EnquiryModel())->where(['is_read' => 0, 'source' => 'contact'])->countAllResults(),
             ],
             'recent'   => $orders->orderBy('id', 'DESC')->findAll(6),
             'lowStock' => (new ProductModel())->where('stock <', 6)->orderBy('stock')->findAll(5),

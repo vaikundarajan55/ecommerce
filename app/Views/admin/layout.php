@@ -11,7 +11,6 @@
 <body>
 <?php
   $unreadEnq = (new \App\Models\EnquiryModel())->where('is_read', 0)->countAllResults();
-  $unreadCon = (new \App\Models\ContactModel())->where('is_read', 0)->countAllResults();
   $uri       = uri_string();
 
   // Sidebar menu: [path, icon, label, badge] or [group label, icon, children]
@@ -28,9 +27,13 @@
       ['admin/users', 'bi-people', 'Users', 0],
       ['admin/reports', 'bi-bar-chart-line', 'Reports', 0],
     ]],
+    ['Website', 'bi-globe2', [
+      ['admin/website/about', 'bi-info-circle', 'About us page', 0],
+      ['admin/website/contact', 'bi-geo-alt', 'Contact details', 0],
+      ['admin/testimonials', 'bi-chat-quote', 'Testimonials', 0],
+    ]],
     ['Messages', 'bi-chat-dots', [
-      ['admin/enquiries', 'bi-question-circle', 'Enquiries', $unreadEnq],
-      ['admin/contacts', 'bi-envelope', 'Contact us', $unreadCon],
+      ['admin/enquiries', 'bi-inbox', 'Enquiries', $unreadEnq],
     ]],
   ];
 
@@ -44,13 +47,14 @@
     'admin/orders'          => ['bi-receipt', 'Review and manage customer orders'],
     'admin/users'           => ['bi-people', 'Registered customers and their accounts'],
     'admin/reports'         => ['bi-bar-chart-line', 'Sales reports by year and month'],
-    'admin/enquiries'       => ['bi-question-circle', 'Questions customers asked about products'],
-    'admin/contacts'        => ['bi-envelope', 'Messages from the contact us form'],
+    'admin/enquiries'       => ['bi-inbox', 'Product questions and contact us messages in one inbox'],
+    'admin/website'         => ['bi-globe2', 'Content shown on the website'],
+    'admin/testimonials'    => ['bi-chat-quote', 'Customer testimonials shown on the website'],
     'admin/change-password' => ['bi-key', 'Keep your admin account secure'],
   ];
   $section = implode('/', array_slice(explode('/', $uri), 0, 2));
   [$pageIcon, $pageSub] = $pages[$section] ?? ['bi-app', ''];
-  $backUrl = substr_count($uri, '/') >= 2 && isset($pages[$section]) ? base_url($section) : null;
+  $backUrl = substr_count($uri, '/') >= 2 && isset($pages[$section]) && $section !== 'admin/website' ? base_url($section) : null;
 
   $adminName = (string) session('admin_name');
   $initials  = strtoupper(implode('', array_map(static fn ($w) => $w[0] ?? '', array_slice(preg_split('/\s+/', trim($adminName) ?: 'A'), 0, 2))));
