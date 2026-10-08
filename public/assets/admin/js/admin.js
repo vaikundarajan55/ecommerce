@@ -29,6 +29,16 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(tick);
   });
 
+  // Scroll-in reveal for dashboard cards (also starts their table rows and progress bars)
+  document.querySelectorAll('.table-reveal tbody tr').forEach((tr, i) => tr.style.setProperty('--i', i));
+  const reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+    reveals.forEach(el => io.observe(el));
+  } else {
+    reveals.forEach(el => el.classList.add('in'));
+  }
+
   // Stagger table rows
   document.querySelectorAll('.row-anim tbody tr').forEach((tr, i) => tr.style.animationDelay = (i * 40) + 'ms');
 
