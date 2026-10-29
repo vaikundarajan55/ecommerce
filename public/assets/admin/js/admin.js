@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Stagger table rows
-  document.querySelectorAll('.row-anim tbody tr').forEach((tr, i) => tr.style.animationDelay = (i * 40) + 'ms');
+  document.querySelectorAll('.row-anim tbody tr').forEach((tr, i) => tr.style.animationDelay = (i * 70) + 'ms');
 
   // Image preview for file inputs
   document.querySelectorAll('input[type=file][data-preview]').forEach(inp => inp.addEventListener('change', () => {
